@@ -38,3 +38,27 @@ def save_question_to_db(user_id, username, question_text):
                    (user_id, username, question_text))
     conn.commit()
     conn.close()
+
+
+def get_professions_by_criteria(interests, education, income, work_type):
+    conn = sqlite3.connect("profession.db")
+    cursor = conn.cursor()
+
+    query = """
+        SELECT name FROM professions_criteries
+        WHERE interests LIKE ?
+        AND education LIKE ?
+        AND income LIKE ?
+        AND work_type LIKE ?
+    """
+
+    cursor.execute(query, (
+        f"%{interests}%",
+        f"%{education}%",
+        f"%{income}%",
+        f"%{work_type}%"
+    ))
+
+    results = [row[0] for row in cursor.fetchall()]
+    conn.close()
+    return results
