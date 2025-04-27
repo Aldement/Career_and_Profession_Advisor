@@ -123,7 +123,7 @@ def show_profession_suggestions(message):
         selection['work_type']
     )
 
-    if professions:
+    if professions: 
         response = "Вот подходящие профессии:\n" + "\n".join([f"- {p}" for p in professions])
     else:
         response = "Не удалось найти профессии по заданным критериям."
@@ -131,10 +131,31 @@ def show_profession_suggestions(message):
     bot.send_message(message.chat.id, response, reply_markup=types.ReplyKeyboardRemove())
     del user_selections[user_id]  # Очистка после ответа
 
-@bot.message_handler(commands=['input']) #пользователь сам вводит свои критерии, бот через chat gpt предлагает профессию
-def input_criteries():
-    pass
+@bot.message_handler(commands=['input'])  # Пользователь вводит свои критерии, бот через ChatGPT предлагает профессию
+def input_criteries(message):
+    user_id = message.from_user.id
+    bot.send_message(message.chat.id, "Напиши свои интересы, образование, ожидаемый доход и тип работы через запятую.\nНапример: 'Работа с людьми, Высшее, Средний, Офис'.")
+    bot.register_next_step_handler(message, handle_input_criteria)
 
+def handle_input_criteria(message):
+    user_id = message.from_user.id
+    criteria = message.text.split(',')
+
+    if len(criteria) != 4:
+        bot.send_message(message.chat.id, "Пожалуйста, укажи все 4 критерия (интересы, образование, доход, тип работы) через запятую.")
+        return
+
+    interest, education, income, work_type = map(str.strip, criteria)
+
+    # Используем GPT для получения подходящей профессии
+    profession = get_profession_from_gpt(interest, education, income, work_type)
+    
+    if profession:
+        bot.send_message(message.chat.id, f"Вот подходящая профессия по твоим критериям: {profession}.")
+    else:
+        bot.send_message(message.chat.id, "Не удалось найти подходящую профессию. Попробуй изменить критерии.")
+
+        
 @bot.message_handler(commands=['info']) #бот подробно рассказывает о профессии по названию
 def info_profession():
     pass
