@@ -4,8 +4,7 @@ from openai import OpenAI
 from config import *
 
 
-
-
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Самые популярные вопросы 
 faq_data = {
@@ -68,6 +67,21 @@ def get_professions_by_criteria(interests, education, income, work_type):
     results = [row[0] for row in cursor.fetchall()]
     conn.close()
     return results
+
+def get_profession_from_gpt(interest, education, income, work_type):
+    prompt = f"Пользователь ищет профессию с интересами '{interest}', уровнем образования '{education}', ожидаемым доходом '{income}', типом работы '{work_type}'. Предложи подходящую профессию в виде ответа как: Профессия которая вам подходит это: 'профессия'"
+
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "Ты помощник по выбору профессий."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.7,
+    )
+
+    profession = response.choices[0].message.content.strip()
+    return profession
 
 
 def get_profession_info(profession_name):

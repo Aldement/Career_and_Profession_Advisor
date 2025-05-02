@@ -1,1 +1,2 @@
-TOKEN = "7744328844:AAGCKxR68TF-Ikcl0yBdK1sD99ghr76whYI"
+TOKEN = "Your Bot-Token"
+OPENAI_API_KEY = "Your API key"

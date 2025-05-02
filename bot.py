@@ -4,7 +4,7 @@ from logic import *
 from telebot import types
 
 bot = telebot.TeleBot(TOKEN)
-init_db()
+init_db() 
 
 # Храним ID пользователей, которых уже поприветствовали
 welcomed_users = set()
