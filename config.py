@@ -1,7 +1,1 @@
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-TOKEN = os.getenv("TELEGRAM_TOKEN")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+TOKEN = "7744328844:AAGCKxR68TF-Ikcl0yBdK1sD99ghr76whYI"

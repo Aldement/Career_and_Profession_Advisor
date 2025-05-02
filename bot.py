@@ -155,10 +155,22 @@ def handle_input_criteria(message):
     else:
         bot.send_message(message.chat.id, "Не удалось найти подходящую профессию. Попробуй изменить критерии.")
 
-        
-@bot.message_handler(commands=['info']) #бот подробно рассказывает о профессии по названию
-def info_profession():
-    pass
+
+@bot.message_handler(commands=['info'])
+def info_profession(message):
+    bot.send_message(message.chat.id, "Напиши название профессии, о которой ты хочешь узнать больше.")
+    bot.register_next_step_handler(message, handle_profession_name)
+
+def handle_profession_name(message):
+    profession_name = message.text.strip()
+
+    # Получаем информацию о профессии с помощью функции из logic.py
+    profession_info = get_profession_info(profession_name)
+
+    if profession_info:
+        bot.send_message(message.chat.id, profession_info)
+    else:
+        bot.send_message(message.chat.id, "Извините, я не нашел информацию о такой профессии. Попробуй ввести другое название.")
 
 # Запуск
 print("Бот работает...")

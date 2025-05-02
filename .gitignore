@@ -1,5 +1,0 @@
-# Игнорировать папку config/
-config/
-
-.env
-__pycache__/

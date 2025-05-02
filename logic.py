@@ -4,7 +4,7 @@ from openai import OpenAI
 from config import *
 
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+
 
 
 # Самые популярные вопросы 
@@ -69,17 +69,34 @@ def get_professions_by_criteria(interests, education, income, work_type):
     conn.close()
     return results
 
-def get_profession_from_gpt(interest, education, income, work_type):
-    prompt = f"Пользователь ищет профессию с интересами '{interest}', уровнем образования '{education}', ожидаемым доходом '{income}', типом работы '{work_type}'. Предложи подходящую профессию в виде ответа как: Профессия которая вам подходит это: 'профессия'"
 
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "Ты помощник по выбору профессий."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.7,
-    )
+def get_profession_info(profession_name):
+    conn = sqlite3.connect("profession.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
 
-    profession = response.choices[0].message.content.strip()
-    return profession
+    profession_name_formatted = profession_name.strip().lower().title()
+
+    # Получаем информацию о профессии из базы данных
+    cursor.execute("SELECT * FROM Professions WHERE name = ?", (profession_name_formatted,))
+    profession = cursor.fetchone()
+
+    conn.close()
+
+    if profession:
+        # Формируем строку с информацией о профессии
+        profession_info = (
+            f"Профессия: {profession['name']}\n"
+            f"Категория: {profession['category']}\n"
+            f"Описание: {profession['description']}\n"
+            f"Обязанности: {profession['responsibilities']}\n"
+            f"Преимущества: {profession['advantages']}\n"
+            f"Недостатки: {profession['disadvantages']}\n"
+            f"Средняя зарплата: {profession['average_salary']} евро.\n"
+            f"Требуемое образование: {profession['education_requirements']}\n"
+            f"Необходимые навыки: {profession['skills_required']}\n"
+            f"Карьерные перспективы: {profession['career_prospects']}\n"
+        )
+        return profession_info
+    else:
+        return None
