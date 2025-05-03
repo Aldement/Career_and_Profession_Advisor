@@ -89,7 +89,7 @@ def get_profession_info(profession_name):
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    profession_name_formatted = profession_name.strip().lower().title()
+    profession_name_formatted = profession_name.strip()
 
     # Получаем информацию о профессии из базы данных
     cursor.execute("SELECT * FROM Professions WHERE name = ?", (profession_name_formatted,))
@@ -114,3 +114,11 @@ def get_profession_info(profession_name):
         return profession_info
     else:
         return None
+    
+def get_all_professions():
+    conn = sqlite3.connect("profession.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM Professions")
+    rows = cursor.fetchall()
+    conn.close()
+    return [row[0] for row in rows]

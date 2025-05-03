@@ -2,6 +2,7 @@ from config import TOKEN
 import telebot
 from logic import *
 from telebot import types
+from rapidfuzz import process, fuzz
 
 bot = telebot.TeleBot(TOKEN)
 init_db() 
@@ -163,14 +164,22 @@ def info_profession(message):
 
 def handle_profession_name(message):
     profession_name = message.text.strip()
-
-    # Получаем информацию о профессии с помощью функции из logic.py
+    
     profession_info = get_profession_info(profession_name)
 
     if profession_info:
         bot.send_message(message.chat.id, profession_info)
     else:
-        bot.send_message(message.chat.id, "Извините, я не нашел информацию о такой профессии. Попробуй ввести другое название.")
+        all_professions = get_all_professions()
+        result = process.extractOne(profession_name, all_professions, scorer=fuzz.token_sort_ratio)
+
+        if result:
+            match, score, _ = result
+
+        if score >= 70:
+            bot.send_message(message.chat.id, f"Информации по запросу нет. Может быть, вы имели в виду: {match}?")
+        else:
+            bot.send_message(message.chat.id, "Извините, я не нашел информацию о такой профессии. Попробуй ввести другое название.")
 
 # Запуск
 print("Бот работает...")
